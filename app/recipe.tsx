@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, router } from 'expo-router';
 import { ReactNode, useEffect, useState } from 'react';
-import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import Button from '../src/components/Button';
 import { EmptyState } from '../src/components/StatusViews';
 import { getCurrentRecipe } from '../src/store/currentRecipe';
+import { findRecipeImage } from '../src/services/recipeImage';
 import { addFavorite, isFavorite, removeFavorite } from '../src/storage/favorites';
 import { colors, radius, space, type } from '../src/theme';
 import { Recipe } from '../src/types';
@@ -68,6 +69,7 @@ export default function RecipeScreen() {
         }}
       />
       <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={styles.content}>
+        <RecipeImage recipe={recipe} />
         <Text style={styles.cuisine}>{recipe.cuisine}</Text>
         <Text style={type.display}>{recipe.title}</Text>
         <Text style={[type.body, { color: colors.muted }]}>{recipe.description}</Text>
@@ -133,6 +135,46 @@ export default function RecipeScreen() {
   );
 }
 
+function RecipeImage({ recipe }: { recipe: Recipe }) {
+  // undefined while looking up, null when no photo was found or it failed to load.
+  const [url, setUrl] = useState<string | null | undefined>(recipe.imageUrl);
+
+  useEffect(() => {
+    if (recipe.imageUrl) return;
+    let active = true;
+    findRecipeImage(recipe).then((found) => {
+      if (!active) return;
+      // Keep it on the recipe so saving it stores the photo too.
+      if (found) recipe.imageUrl = found;
+      setUrl(found);
+    });
+    return () => {
+      active = false;
+    };
+  }, [recipe]);
+
+  return (
+    <View>
+      <View style={styles.hero}>
+        {url ? (
+          <Image
+            source={{ uri: url }}
+            style={StyleSheet.absoluteFill}
+            resizeMode="cover"
+            onError={() => setUrl(null)}
+            accessibilityLabel={`Photo of ${recipe.imageQuery || recipe.title}`}
+          />
+        ) : url === undefined ? (
+          <ActivityIndicator color={colors.basil} />
+        ) : (
+          <Ionicons name="restaurant-outline" size={48} color={colors.basil} />
+        )}
+      </View>
+      {url ? <Text style={styles.credit}>Reference photo from Wikimedia Commons</Text> : null}
+    </View>
+  );
+}
+
 function Stat({ icon, value, label }: { icon: keyof typeof Ionicons.glyphMap; value: string; label: string }) {
   return (
     <View style={styles.stat}>
@@ -154,6 +196,15 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 const styles = StyleSheet.create({
   content: { padding: space.xl, gap: space.lg, paddingBottom: 56 },
+  hero: {
+    height: 220,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+    backgroundColor: colors.basilSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  credit: { ...type.small, fontSize: 11, marginTop: space.xs, textAlign: 'right' },
   cuisine: { fontSize: 14, fontWeight: '700', color: colors.basil },
   stats: {
     flexDirection: 'row',
