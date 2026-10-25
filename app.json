@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Kitchen Master",
+    "slug": "kitchen-master",
+    "version": "1.0.0",
+    "scheme": "kitchenmaster",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kitchenmaster.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Kitchen Master uses the camera to photograph your ingredients and suggest recipes.",
+        "NSPhotoLibraryUsageDescription": "Kitchen Master needs your photos so you can pick a picture of your ingredients."
+      }
+    },
+    "android": {
+      "package": "com.kitchenmaster.app",
+      "permissions": [
+        "CAMERA"
+      ]
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Kitchen Master uses the camera to photograph your ingredients and suggest recipes.",
+          "photosPermission": "Kitchen Master needs your photos so you can pick a picture of your ingredients."
+        }
+      ],
+      "expo-asset",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
