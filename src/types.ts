@@ -18,6 +18,10 @@ export interface Recipe {
   ingredients: RecipeIngredient[];
   steps: string[];
   tips?: string[];
+  /** English Wikipedia article name of the closest well-known dish, used to find a photo */
+  imageQuery?: string;
+  /** Photo found for this recipe, kept so saved recipes don't look it up again */
+  imageUrl?: string;
   source: 'scan' | 'search';
 }
 

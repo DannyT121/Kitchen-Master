@@ -9,7 +9,8 @@ const RECIPE_SCHEMA = `{
   "servings": number,
   "ingredients": [{ "name": string, "quantity": string, "available": boolean }],
   "steps": string[] (clear instructions in order, without step numbers in the text),
-  "tips": string[] (0-3 short tips)
+  "tips": string[] (0-3 short tips),
+  "imageQuery": string (the English Wikipedia article title of the closest well-known dish, e.g. "Palak paneer", "Fried rice", "Shakshouka")
 }`;
 
 export function dietInstruction(diet: DietFilter): string {
